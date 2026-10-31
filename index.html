@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Интерактивная Баллистика 3D</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1a1a1a;
+            color: #fff;
+        }
+
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* Панель управления в стиле проекта одноклассника */
+        .ui-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(30, 30, 30, 0.85);
+            backdrop-filter: blur(10px);
+            border: 1px solid #444;
+            padding: 20px;
+            border-radius: 12px;
+            width: 300px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            z-index: 10;
+        }
+
+        h1 {
+            font-size: 18px;
+            margin-top: 0;
+            margin-bottom: 15px;
+            text-align: center;
+            color: #00ffcc;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            margin-bottom: 5px;
+            color: #ccc;
+        }
+
+        .slider-val {
+            float: right;
+            color: #00ffcc;
+            font-weight: bold;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            accent-color: #00ffcc;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #00ffcc, #0099ff);
+            border: none;
+            border-radius: 6px;
+            color: #1a1a1a;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0,255,204,0.3);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,255,204,0.5);
+        }
+
+        /* Панель с результатами вычислений */
+        .stats-panel {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(30, 30, 30, 0.85);
+            backdrop-filter: blur(5px);
+            border: 1px solid #444;
+            padding: 15px;
+            border-radius: 12px;
+            width: 300px;
+            font-size: 14px;
+            z-index: 10;
+        }
+
+        .stats-line {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        .stats-line:last-child { margin-bottom: 0; }
+        .stats-label { color: #aaa; }
+        .stats-value { color: #ffcc00; font-family: monospace; font-size: 15px; }
+    </style>
+    <!-- Подключаем Three.js и OrbitControls для вращения камеры -->
+    <script src="https://cloudflare.com"></script>
+    <script src="https://jsdelivr.net"></script>
+</head>
+<body>
+
+    <div class="ui-panel">
+        <h1>Баллистика 3D</h1>
+        
+        <div class="control-group">
+            <label>Угол наклона: <span id="angle-val" class="slider-val">45°</span></label>
+            <input type="range" id="angle-slider" min="10" max="85" value="45">
+        </div>
+
+        <div class="control-group">
+            <label>Начальная скорость: <span id="speed-val" class="slider-val">20 м/с</span></label>
+            <input type="range" id="speed-slider" min="5" max="40" value="20">
+        </div>
+
+        <div class="control-group">
+            <label>Гравитация (g): <span id="g-val" class="slider-val">9.8 м/с²</span></label>
+            <input type="range" id="g-slider" min="2" max="25" step="0.1" value="9.8">
+        </div>
+
+        <button id="fire-btn">ПУСК СНАРЯДА</button>
+    </div>
+
+    <div class="stats-panel">
