@@ -2,740 +2,507 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sci-Fi Баллистическая Лаборатория</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#060810">
+<title>Баллистическая лаборатория</title>
 <style>
-    * { box-sizing: border-box; }
-    html, body { height: 100%; }
-    body {
-        margin: 0; padding: 0; overflow: hidden;
-        font-family: 'Segoe UI', Arial, sans-serif;
-        background-color: #060810; color: #fff;
-        user-select: none;
-    }
-    canvas { display: block; position: fixed; inset: 0; }
-
-    .ui-panel {
-        position: absolute; top: 20px; left: 20px;
-        background: rgba(13, 17, 28, 0.9);
-        border: 1px solid #1f293d;
-        padding: 22px; border-radius: 16px; width: 290px;
-        z-index: 10; box-shadow: 0 10px 30px rgba(0,0,0,0.7);
-        backdrop-filter: blur(12px);
-    }
-    h1 {
-        font-size: 15px; margin: 0 0 18px 0; text-align: center;
-        color: #00f3ff; text-transform: uppercase; letter-spacing: 1.5px;
-        text-shadow: 0 0 10px rgba(0,243,255,0.3);
-    }
-    .control-group { margin-bottom: 14px; }
-    label {
-        display: block; font-size: 11px; margin-bottom: 6px;
-        color: #7e8b9b; text-transform: uppercase;
-    }
-    .slider-val {
-        float: right; color: #00f3ff; font-weight: bold;
-        font-family: monospace; font-size: 13px;
-    }
-    input[type="range"] { width: 100%; cursor: pointer; accent-color: #00f3ff; }
-    button {
-        width: 100%; padding: 14px;
-        background: linear-gradient(135deg, #00f3ff, #0066ff);
-        border: none; border-radius: 8px; color: #060810;
-        font-weight: bold; font-size: 13px; text-transform: uppercase;
-        letter-spacing: 1px; cursor: pointer; margin-top: 5px;
-        transition: box-shadow .2s, filter .2s;
-    }
-    button:hover { box-shadow: 0 6px 20px rgba(0,243,255,0.5); }
-    button:disabled { filter: grayscale(0.6) brightness(0.7); cursor: default; box-shadow: none; }
-
-    .formula-panel {
-        position: absolute; top: 20px; right: 20px;
-        background: rgba(13, 17, 28, 0.85);
-        border: 1px solid #1f293d;
-        padding: 16px; border-radius: 16px; width: 320px;
-        z-index: 10; font-family: monospace; font-size: 13px;
-        backdrop-filter: blur(12px);
-    }
-    .formula-title {
-        color: #00f3ff; margin-bottom: 10px; font-weight: bold;
-        text-transform: uppercase; font-size: 11px;
-    }
-    .formula-block {
-        background: #090b11; padding: 10px 12px; border-radius: 8px;
-        margin-bottom: 10px; border-left: 3px solid #0066ff;
-        color: #dbdeb8; line-height: 1.6;
-    }
-    .formula-block:last-child { margin-bottom: 0; }
-
-    .stats-panel {
-        position: absolute; bottom: 20px; left: 20px;
-        background: rgba(13, 17, 28, 0.9);
-        border: 1px solid #1f293d;
-        padding: 16px; border-radius: 16px; width: 290px; z-index: 10;
-    }
-    .stats-line { display: flex; justify-content: space-between; margin-bottom: 8px; align-items: center; }
-    .stats-line:last-child { margin-bottom: 0; }
-    .stats-label { color: #7e8b9b; font-size: 12px; text-transform: uppercase; }
-    .stats-value { color: #ffca28; font-family: monospace; font-size: 15px; font-weight: bold; }
-    .stats-value.live { color: #00f3ff; }
+:root{--bg:#060810;--cy:#00f3ff;--tx:#d8f6ff;--mut:#7f97a8;--pn:rgba(10,16,32,.82)}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;overflow:hidden;touch-action:manipulation}
+canvas{position:fixed;inset:0;display:block}
+#panel{position:fixed;top:12px;right:12px;width:290px;max-height:calc(100% - 24px);overflow-y:auto;background:var(--pn);border:1px solid rgba(0,243,255,.3);border-radius:10px;padding:12px;backdrop-filter:blur(6px)}
+h1{font-size:15px;margin:0 0 8px;color:var(--cy)}
+.row{margin:7px 0}
+.row label{display:flex;justify-content:space-between;font-size:13px;color:var(--mut)}
+.row b{color:var(--tx);font-weight:600}
+input[type=range]{width:100%;accent-color:var(--cy);margin:4px 0 0}
+#fireBtn{width:100%;margin-top:8px;padding:12px;font-size:15px;font-weight:600;color:#001419;background:var(--cy);border:0;border-radius:8px}
+#fireBtn:disabled{opacity:.55}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px;font-size:11px;color:var(--mut);text-align:center}
+.stats div{background:rgba(0,243,255,.07);border-radius:6px;padding:6px 2px}
+.stats span{display:block;font:600 13px monospace;color:var(--tx);margin-top:2px}
+.live{margin-top:10px;padding:8px;border:1px dashed rgba(0,243,255,.35);border-radius:6px;font:12px/1.6 monospace}
+.live .f{color:var(--mut)}
+.live .v{color:var(--cy)}
+.layouts{display:flex;gap:6px;margin-top:10px}
+.layouts button{flex:1;padding:7px 0;font-size:12px;color:var(--mut);background:transparent;border:1px solid rgba(0,243,255,.25);border-radius:6px}
+.layouts button.active{color:#001419;background:var(--cy);border-color:var(--cy)}
+/* мобильная раскладка: панель снизу, земля над ней */
+body.layout-mobile #panel{top:auto;right:0;left:0;bottom:0;width:100%;max-height:56%;border-radius:14px 14px 0 0;border-width:1px 0 0;padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px))}
+body.layout-mobile .row{margin:4px 0}
+body.layout-mobile .live,body.layout-mobile .stats{margin-top:6px}
 </style>
 </head>
 <body>
-
-<canvas id="simCanvas"></canvas>
-
-<div class="ui-panel">
-    <h1>Параметры системы</h1>
-    <div class="control-group">
-        <label>Угол прицела: <span id="angle-val" class="slider-val">45°</span></label>
-        <input type="range" id="angle-slider" min="5" max="85" value="45">
-    </div>
-    <div class="control-group">
-        <label>Скорость (v₀): <span id="speed-val" class="slider-val">50 м/с</span></label>
-        <input type="range" id="speed-slider" min="15" max="90" value="50">
-    </div>
-    <div class="control-group">
-        <label>Гравитация (g): <span id="g-val" class="slider-val">9.8 м/с²</span></label>
-        <input type="range" id="g-slider" min="2" max="25" step="0.1" value="9.8">
-    </div>
-    <button id="fire-btn">Запустить снаряд</button>
+<canvas id="c"></canvas>
+<div id="panel">
+  <h1>Баллистическая лаборатория</h1>
+  <div class="row"><label>Угол <b id="angleVal">45°</b></label><input id="angle" type="range" min="5" max="85" step="1" value="45"></div>
+  <div class="row"><label>Скорость <b id="speedVal">50 м/с</b></label><input id="speed" type="range" min="10" max="150" step="1" value="50"></div>
+  <div class="row"><label>Гравитация <b id="gVal">9.8 м/с²</b></label><input id="g" type="range" min="1" max="25" step="0.1" value="9.8"></div>
+  <button id="fireBtn">Запустить снаряд</button>
+  <div class="stats">
+    <div>Дальность<span id="statRange">0.00 м</span></div>
+    <div>Высота<span id="statHeight">0.00 м</span></div>
+    <div>Время<span id="statTime">0.00 с</span></div>
+  </div>
+  <div class="live">
+    <div class="f" id="formulaX">x(t) = …</div>
+    <div class="f" id="formulaY">y(t) = …</div>
+    <div>t = <span class="v" id="liveT">0.00</span> с</div>
+    <div>x = <span class="v" id="liveX">0.00</span> м, y = <span class="v" id="liveY">0.00</span> м</div>
+  </div>
+  <div class="layouts">
+    <button data-layout="auto">Авто</button>
+    <button data-layout="desktop">ПК</button>
+    <button data-layout="mobile">Телефон</button>
+  </div>
 </div>
-
-<div class="formula-panel">
-    <div class="formula-title">Уравнения движения тела:</div>
-    <div class="formula-block">
-        <strong>По оси X (равномерное):</strong>
-
-        x(t) = v₀ · cos(α) · t
-
-        <span id="formula-x" style="color:#00f3ff;font-weight:bold;">x(t) = 35.4 · t</span>
-    </div>
-    <div class="formula-block">
-        <strong>По оси Y (равноускоренное):</strong>
-
-        y(t) = v₀ · sin(α) · t − (g · t²) / 2
-
-        <span id="formula-y" style="color:#ffaa00;font-weight:bold;">y(t) = 35.4 · t − 4.90 · t²</span>
-    </div>
-</div>
-
-<div class="stats-panel">
-    <div class="stats-line"><span class="stats-label">Дальность (X):</span><span id="stat-range" class="stats-value">0.00 м</span></div>
-    <div class="stats-line"><span class="stats-label">Высота (H):</span><span id="stat-height" class="stats-value">0.00 м</span></div>
-    <div class="stats-line"><span class="stats-label">Время (T):</span><span id="stat-time" class="stats-value">0.00 с</span></div>
-</div>
-
 <script>
 (function () {
-    'use strict';
+'use strict';
+/* ===== 1. Элементы и состояние ===== */
+var $ = function (id) { return document.getElementById(id); };
+var canvas = $('c'), ctx = canvas.getContext('2d');
+var angleSlider = $('angle'), speedSlider = $('speed'), gSlider = $('g');
+var angleValEl = $('angleVal'), speedValEl = $('speedVal'), gValEl = $('gVal');
+var fireBtn = $('fireBtn');
+var statRangeEl = $('statRange'), statHeightEl = $('statHeight'), statTimeEl = $('statTime');
+var liveTEl = $('liveT'), liveXEl = $('liveX'), liveYEl = $('liveY');
+var formulaXEl = $('formulaX'), formulaYEl = $('formulaY');
+var layoutBtns = document.querySelectorAll('.layouts button');
 
-    /* ================= DOM ================= */
-    const canvas = document.getElementById('simCanvas');
-    const ctx    = canvas.getContext('2d');
+var W = 0, H = 0, START_X = 70, GROUND_OFFSET = 110;
+var angle = 45, speed = 50, gravity = 9.8, scale = 2;
+var flying = false, posX = 0, posY = 0, timeInFlight = 0;
+var trail = [], particles = [], impact = null, flash = 0;
+var stars = [], bgCanvas = null, lastFrameTime = 0, resizeTimer = null;
+var layoutSetting = 'auto', activeLayout = 'desktop';
 
-    const angleSlider = document.getElementById('angle-slider');
-    const speedSlider = document.getElementById('speed-slider');
-    const gSlider     = document.getElementById('g-slider');
-    const fireBtn     = document.getElementById('fire-btn');
+/* ===== 2. Раскладка ===== */
+function groundY() { return H - GROUND_OFFSET; }
+function getStoredLayout() {
+    try {
+        var v = localStorage.getItem('ballistics-layout');
+        if (v === 'auto' || v === 'desktop' || v === 'mobile') return v;
+    } catch (e) {}
+    return 'auto';
+}
+function storeLayout(v) { try { localStorage.setItem('ballistics-layout', v); } catch (e) {} }
+function resolveLayout() {
+    if (layoutSetting === 'auto') return (W < 700 || H > W * 1.1) ? 'mobile' : 'desktop';
+    return layoutSetting;
+}
+function isMobileLayout() { return activeLayout === 'mobile'; }
 
-    const angleValEl  = document.getElementById('angle-val');
-    const speedValEl  = document.getElementById('speed-val');
-    const gValEl      = document.getElementById('g-val');
-
-    const statRangeEl  = document.getElementById('stat-range');
-    const statHeightEl = document.getElementById('stat-height');
-    const statTimeEl   = document.getElementById('stat-time');
-
-    const formulaXEl = document.getElementById('formula-x');
-    const formulaYEl = document.getElementById('formula-y');
-
-    /* ================= Геометрия сцены ================= */
-    let W = 0, H = 0;
-    const START_X = 90;
-    const GROUND_OFFSET = 110;
-    const groundY = () => H - GROUND_OFFSET;
-
-    /* ================= ФОН ================= */
-    let bgCanvas = null;
-    let stars = [];
-
-    function initStars() {
-        stars = [];
-        const count = Math.min(240, Math.max(80, Math.floor((W * H) / 6500)));
-        for (let i = 0; i < count; i++) {
-            const rnd = Math.random();
-            stars.push({
-                x: Math.random() * W,
-                y: Math.random() * H * 0.82,
-                r: Math.random() * 1.3 + 0.2,
-                phase: Math.random() * Math.PI * 2,
-                speed: 0.4 + Math.random() * 1.5,
-                brightness: 0.3 + Math.random() * 0.7,
-                color: rnd < 0.7 ? '255,255,255'
-                     : rnd < 0.85 ? '180,220,255'
-                     : '255,220,180'
-            });
-        }
+function applyLayout() {
+    activeLayout = resolveLayout();
+    document.body.classList.toggle('layout-mobile', activeLayout === 'mobile');
+    GROUND_OFFSET = (activeLayout === 'mobile') ? Math.round(H * 0.58) : 110;
+    for (var i = 0; i < layoutBtns.length; i++) {
+        var b = layoutBtns[i];
+        b.classList.toggle('active', b.getAttribute('data-layout') === layoutSetting);
     }
+}
 
-    function drawMountainLayer(bgc, baseY, color, maxH, freq, seed, lift) {
-        const step = 5;
-        bgc.beginPath();
-        bgc.moveTo(0, baseY);
-        for (let x = 0; x <= W + step; x += step) {
-            const wave =
-                0.55 * Math.sin(x * 0.0028 * freq + seed) +
-                0.28 * Math.sin(x * 0.0071 * freq + seed * 1.7) +
-                0.12 * Math.sin(x * 0.0153 * freq + seed * 2.3) +
-                0.05 * Math.sin(x * 0.0341 * freq + seed * 3.1);
-            const h = maxH * (Math.abs(wave) * 1.35 + 0.06);
-            bgc.lineTo(x, baseY - h - lift);
-        }
-        bgc.lineTo(W, baseY);
-        bgc.closePath();
-        bgc.fillStyle = color;
-        bgc.fill();
+/* ===== 4. Масштаб ===== */
+function computeScale() {
+    var rad = angle * Math.PI / 180;
+    var v0x = speed * Math.cos(rad), v0y = speed * Math.sin(rad);
+    var tF = 2 * v0y / gravity;
+    var maxX = v0x * tF, maxY = v0y * v0y / (2 * gravity);
+    var gy = groundY();
+    if (maxX <= 0 || maxY <= 0) return 2;
+    var rightPad = isMobileLayout() ? 40 : 330;
+    var s = Math.min((W - START_X - rightPad) / maxX, (gy - 80) / maxY);
+    return Math.max(0.2, Math.min(s, 10));
+}
+
+/* ===== 5. Фон ===== */
+function buildBackground() {
+    if (!bgCanvas) bgCanvas = document.createElement('canvas');
+    var dpr = window.devicePixelRatio || 1;
+    bgCanvas.width = Math.floor(W * dpr);
+    bgCanvas.height = Math.floor(H * dpr);
+    var b = bgCanvas.getContext('2d');
+    b.setTransform(dpr, 0, 0, dpr, 0, 0);
+    var grad = b.createLinearGradient(0, 0, 0, H);
+    grad.addColorStop(0, '#060810');
+    grad.addColorStop(0.6, '#080b16');
+    grad.addColorStop(1, '#0a1020');
+    b.fillStyle = grad;
+    b.fillRect(0, 0, W, H);
+    var count = Math.max(80, Math.floor(W * H / 9000));
+    for (var i = 0; i < count; i++) {
+        b.globalAlpha = Math.random() * 0.55 + 0.15;
+        b.fillStyle = '#fff';
+        b.beginPath();
+        b.arc(Math.random() * W, Math.random() * H, Math.random() * 1.3 + 0.2, 0, Math.PI * 2);
+        b.fill();
     }
+    b.globalAlpha = 1;
+    var neb = b.createRadialGradient(W * 0.75, H * 0.25, 0, W * 0.75, H * 0.25, Math.max(W, H) * 0.5);
+    neb.addColorStop(0, 'rgba(0,80,180,0.12)');
+    neb.addColorStop(1, 'rgba(0,0,0,0)');
+    b.fillStyle = neb;
+    b.fillRect(0, 0, W, H);
+}
 
-    function buildBackground() {
-        bgCanvas = document.createElement('canvas');
-        bgCanvas.width = W;
-        bgCanvas.height = H;
-        const bgc = bgCanvas.getContext('2d');
-        const gy = groundY();
+/* ===== 6. Отрисовка ===== */
+function roundRect(c, x, y, w, h, r) {
+    c.beginPath();
+    c.moveTo(x + r, y);
+    c.lineTo(x + w - r, y);
+    c.quadraticCurveTo(x + w, y, x + w, y + r);
+    c.lineTo(x + w, y + h - r);
+    c.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    c.lineTo(x + r, y + h);
+    c.quadraticCurveTo(x, y + h, x, y + h - r);
+    c.lineTo(x, y + r);
+    c.quadraticCurveTo(x, y, x + r, y);
+    c.closePath();
+}
 
-        /* ---- Небо ---- */
-        const sky = bgc.createLinearGradient(0, 0, 0, gy);sky.addColorStop(0,    '#02040a');
-        sky.addColorStop(0.45, '#050a18');
-        sky.addColorStop(0.72, '#0a1024');
-        sky.addColorStop(1,    '#0d1730');
-        bgc.fillStyle = sky;
-        bgc.fillRect(0, 0, W, gy);
-
-        /* ---- Туманности ---- */
-        const nebulas = [
-            { x: W * 0.15, y: gy * 0.30, r: Math.min(W, H) * 0.55, c1: 'rgba(80,40,170,0.22)',  c2: 'rgba(80,40,170,0)' },
-            { x: W * 0.78, y: gy * 0.22, r: Math.min(W, H) * 0.60, c1: 'rgba(0,140,210,0.16)',  c2: 'rgba(0,140,210,0)' },
-            { x: W * 0.50, y: gy * 0.55, r: Math.min(W, H) * 0.70, c1: 'rgba(140,30,180,0.11)', c2: 'rgba(140,30,180,0)' },
-            { x: W * 0.92, y: gy * 0.55, r: Math.min(W, H) * 0.42, c1: 'rgba(0,200,255,0.10)',  c2: 'rgba(0,200,255,0)' }
-        ];
-        for (const n of nebulas) {
-            const g = bgc.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.r);
-            g.addColorStop(0, n.c1);
-            g.addColorStop(1, n.c2);
-            bgc.fillStyle = g;
-            bgc.fillRect(0, 0, W, gy);
-        }
-
-        /* ---- Полярное свечение ---- */
-        for (let i = 0; i < 3; i++) {
-            const yBase = gy * (0.12 + i * 0.09);
-            const gr = bgc.createLinearGradient(0, yBase - 40, 0, yBase + 40);
-            gr.addColorStop(0, 'rgba(0,255,180,0)');
-            gr.addColorStop(0.5, `rgba(${60 + i * 25},255,${150 + i * 40},0.045)`);
-            gr.addColorStop(1, 'rgba(0,255,180,0)');
-            bgc.fillStyle = gr;
-            bgc.fillRect(0, yBase - 40, W, 80);
-        }
-
-        /* ---- Далёкая планета с кольцами ---- */
-        const px = W * 0.82;
-        const py = gy * 0.20;
-        const pr = Math.min(W, H) * 0.055;
-        if (pr > 14) {
-            const glow = bgc.createRadialGradient(px, py, pr * 0.6, px, py, pr * 3);
-            glow.addColorStop(0, 'rgba(100,180,255,0.28)');
-            glow.addColorStop(1, 'rgba(100,180,255,0)');
-            bgc.fillStyle = glow;
-            bgc.fillRect(px - pr * 3, py - pr * 3, pr * 6, pr * 6);
-
-            const body = bgc.createRadialGradient(
-                px - pr * 0.35, py - pr * 0.35, pr * 0.1, px, py, pr
-            );
-            body.addColorStop(0,    'rgba(180,220,255,0.95)');
-            body.addColorStop(0.55, 'rgba(80,140,220,0.90)');
-            body.addColorStop(1,    'rgba(20,40,90,0.95)');
-            bgc.fillStyle = body;
-            bgc.beginPath();
-            bgc.arc(px, py, pr, 0, Math.PI * 2);
-            bgc.fill();
-
-            /* Пояса на планете */
-            bgc.save();
-            bgc.beginPath();
-            bgc.arc(px, py, pr, 0, Math.PI * 2);
-            bgc.clip();
-            bgc.fillStyle = 'rgba(20,50,110,0.35)';
-            bgc.beginPath();
-            bgc.ellipse(px, py + pr * 0.35, pr * 0.9, pr * 0.12, 0, 0, Math.PI * 2);
-            bgc.fill();
-            bgc.beginPath();
-            bgc.ellipse(px, py - pr * 0.18, pr * 0.7, pr * 0.09, 0, 0, Math.PI * 2);
-            bgc.fill();
-            bgc.restore();
-
-            /* Кольца */
-            bgc.save();
-            bgc.translate(px, py);
-            bgc.rotate(-0.35);
-            bgc.strokeStyle = 'rgba(140,200,255,0.45)';
-            bgc.lineWidth = 1.5;
-            bgc.beginPath();
-            bgc.ellipse(0, 0, pr * 1.8, pr * 0.28, 0, 0, Math.PI * 2);
-            bgc.stroke();
-            bgc.strokeStyle = 'rgba(140,200,255,0.22)';
-            bgc.lineWidth = 3;
-            bgc.beginPath();
-            bgc.ellipse(0, 0, pr * 2.1, pr * 0.34, 0, 0, Math.PI * 2);
-            bgc.stroke();
-            bgc.restore();
-        }
-
-        /* ---- Три слоя гор ---- */
-        drawMountainLayer(bgc, gy, 'rgba(14,22,40,0.85)', H * 0.14, 0.9, 1.5, 0);
-        drawMountainLayer(bgc, gy, 'rgba(9,14,26,0.95)',  H * 0.10, 1.5, 3.7, 4);
-        drawMountainLayer(bgc, gy, 'rgba(4,7,14,1)',      H * 0.06, 2.2, 5.3, 8);
-
-        /* ---- Свечение над горизонтом ---- */
-        const hor = bgc.createLinearGradient(0, gy - 130, 0, gy);
-        hor.addColorStop(0,   'rgba(0,120,180,0)');
-        hor.addColorStop(0.7, 'rgba(0,160,220,0.08)');
-        hor.addColorStop(1,   'rgba(0,180,240,0.20)');
-        bgc.fillStyle = hor;
-        bgc.fillRect(0, gy - 130, W, 130);
+function drawGround() {
+    var gy = groundY();
+    var g = ctx.createLinearGradient(0, gy, 0, H);
+    g.addColorStop(0, 'rgba(0,243,255,0.10)');
+    g.addColorStop(1, 'rgba(0,102,255,0.01)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, gy, W, H - gy);
+    ctx.strokeStyle = 'rgba(0,243,255,0.06)';
+    ctx.lineWidth = 1;
+    for (var x = 0; x < W; x += 50) {
+        ctx.beginPath(); ctx.moveTo(x, gy); ctx.lineTo(x, H); ctx.stroke();
     }
+    ctx.shadowBlur = 12;
+    ctx.shadowColor = '#00f3ff';
+    ctx.strokeStyle = '#00f3ff';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(W, gy); ctx.stroke();
+    ctx.shadowBlur = 0;
+}
 
-    function drawStars(time) {
-        const t = time * 0.001;
-        for (const s of stars) {
-            const tw = 0.5 + 0.5 * Math.sin(t * s.speed + s.phase);
-            const alpha = s.brightness * (0.55 + 0.45 * tw);
-
-            if (s.r > 0.9) {
-                ctx.fillStyle = 'rgba(' + s.color + ',' + (alpha * 0.22).toFixed(3) + ')';
-                ctx.beginPath();
-                ctx.arc(s.x, s.y, s.r * 3.5, 0, Math.PI * 2);
-                ctx.fill();
-            }
-
-            ctx.fillStyle = 'rgba(' + s.color + ',' + alpha.toFixed(3) + ')';
-            ctx.beginPath();
-            ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-            ctx.fill();
-        }
+function drawDistanceMarkers() {
+    var gy = groundY(), s = scale;
+    if (!s || s <= 0) return;
+    var stepM = 10, stepPx = stepM * s;
+    while (stepPx < 55) { stepM *= 2; stepPx = stepM * s; }
+    ctx.font = '10px monospace';
+    ctx.fillStyle = 'rgba(0,243,255,0.4)';
+    ctx.textAlign = 'center';
+    for (var m = stepM; ; m += stepM) {
+        var px = START_X + m * s;
+        if (px > W - 10) break;
+        ctx.strokeStyle = 'rgba(0,243,255,0.25)';
+        ctx.beginPath(); ctx.moveTo(px, gy); ctx.lineTo(px, gy + 6); ctx.stroke();
+        ctx.fillText(m + 'м', px, gy + 20);
     }
+    ctx.textAlign = 'left';
+}
 
-    function drawHaze() {
-        const gy = groundY();
-        const haze = ctx.createLinearGradient(0, gy - 180, 0, gy);
-        haze.addColorStop(0,   'rgba(0,150,220,0)');
-        haze.addColorStop(0.6, 'rgba(0,170,230,0.06)');
-        haze.addColorStop(1,   'rgba(0,190,255,0.16)');
-        ctx.fillStyle = haze;
-        ctx.fillRect(0, gy - 180, W, 180);
+function drawCannon() {
+    var gy = groundY();
+    ctx.save();
+    ctx.translate(START_X, gy);
+    ctx.save();
+    ctx.rotate(-angle * Math.PI / 180);
+    var bg = ctx.createLinearGradient(0, -7, 0, 7);
+    bg.addColorStop(0, '#3a4d6e'); bg.addColorStop(0.5, '#1e2a3f'); bg.addColorStop(1, '#0e1520');
+    ctx.fillStyle = bg;
+    ctx.strokeStyle = '#00f3ff';
+    ctx.lineWidth = 1.5;
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = 'rgba(0,243,255,0.6)';
+    roundRect(ctx, 0, -7, 48, 14, 3);
+    ctx.fill(); ctx.stroke();
+    ctx.shadowBlur = 0;
+    ctx.restore();
+    ctx.beginPath();
+    ctx.arc(0, 0, 15, Math.PI, 0);
+    ctx.closePath();
+    var base = ctx.createLinearGradient(0, -15, 0, 0);
+    base.addColorStop(0, '#2a3550'); base.addColorStop(1, '#0e1520');
+    ctx.fillStyle = base; ctx.fill();
+    ctx.strokeStyle = '#00f3ff'; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.restore();
+}
+
+function drawTrajectoryPreview() {
+    if (flying || impact) return;
+    var rad = angle * Math.PI / 180;
+    var v0x = speed * Math.cos(rad), v0y = speed * Math.sin(rad);
+    var tF = 2 * v0y / gravity, s = computeScale(), gy = groundY();
+    ctx.strokeStyle = 'rgba(0,243,255,0.28)';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([5, 5]);
+    ctx.beginPath();
+    for (var i = 0; i <= 64; i++) {
+        var t = (i / 64) * tF;
+        var px = START_X + v0x * t * s;
+        var py = gy - (v0y * t - 0.5 * gravity * t * t) * s;
+        if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
     }
+    ctx.stroke();
+    ctx.setLineDash([]);
+    var lx = START_X + v0x * tF * s;
+    ctx.strokeStyle = 'rgba(0,243,255,0.6)';
+    ctx.beginPath();
+    ctx.moveTo(lx - 6, gy - 6); ctx.lineTo(lx + 6, gy + 6);
+    ctx.moveTo(lx + 6, gy - 6); ctx.lineTo(lx - 6, gy + 6);
+    ctx.stroke();
+}
 
-    /* ================= resize ================= */
-    function resize() {
-        const dpr = Math.min(window.devicePixelRatio || 1, 2);
-        W = window.innerWidth;
-        H = window.innerHeight;
-        canvas.width  = Math.round(W * dpr);
-        canvas.height = Math.round(H * dpr);
-        canvas.style.width  = W + 'px';
-        canvas.style.height = H + 'px';
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-        initStars();
-        buildBackground();
+function drawTrail() {
+    if (trail.length < 2) return;
+    var gy = groundY();
+    var rad = fireAngle * Math.PI / 180;
+    var v0x = fireSpeed * Math.cos(rad), v0y = fireSpeed * Math.sin(rad);
+    var steps = 160;
+    ctx.strokeStyle = 'rgba(0,243,255,0.9)';
+    ctx.lineWidth = 2;
+    ctx.shadowBlur = 8;
+    ctx.shadowColor = '#00f3ff';
+    ctx.beginPath();
+    for (var i = 0; i <= steps; i++) {
+        var t = timeInFlight * i / steps;
+        var px = START_X + v0x * t * scale;
+        var py = gy - Math.max(0, v0y * t - 0.5 * fireGravity * t * t) * scale;
+        if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
     }
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+}
 
-    /* ================= Состояние ================= */
-    let angle = 45, speed = 50, gravity = 9.8;
-    let scale = 1;
-    let flying = false, t = 0;
-    let posX = 0, posY = 0;
-    let trail = [], particles = [];
-    let flash = 0, impact = null;
+function drawProjectile() {
+    if (!flying) return;
+    var px = START_X + posX * scale, py = groundY() - posY * scale;
+    ctx.shadowBlur = 25;
+    ctx.shadowColor = '#00f3ff';
+    ctx.fillStyle = '#e8ffff';
+    ctx.beginPath(); ctx.arc(px, py, 5, 0, Math.PI * 2); ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = 'rgba(0,243,255,0.3)';
+    ctx.beginPath(); ctx.arc(px, py, 13, 0, Math.PI * 2); ctx.fill();
+    // живая подпись координат у ядра
+    ctx.font = '11px monospace';
+    ctx.fillStyle = '#d8f6ff';
+    ctx.fillText('(' + posX.toFixed(1) + '; ' + Math.max(0, posY).toFixed(1) + ')', px + 12, py - 12);
+}
 
-    /* ================= Физика ================= */
-    function trajectory() {
-        const rad = angle * Math.PI / 180;
-        const v0x = speed * Math.cos(rad);
-        const v0y = speed * Math.sin(rad);
-        const T   = (2 * v0y) / gravity;
-        const X   = v0x * T;
-        const Hm  = (v0y * v0y) / (2 * gravity);
-        return { rad, v0x, v0y, T, X, Hm };
+/* ===== 7. Частицы и удар ===== */
+function updateParticles(dt) {
+    for (var i = particles.length - 1; i >= 0; i--) {
+        var p = particles[i];
+        p.x += p.vx * dt; p.y += p.vy * dt; p.vy += p.g * dt; p.life -= dt;
+        if (p.life <= 0) particles.splice(i, 1);
     }
-
-    function computeScale(tr) {
-        const availW = Math.max(60, W - START_X - 90);
-        const availH = Math.max(60, groundY() - 100);
-        const sx = tr.X  > 0.01 ? availW / tr.X  : 10;
-        const sy = tr.Hm > 0.01 ? availH / tr.Hm : 10;
-        return Math.max(0.02, Math.min(sx, sy));
+}
+function drawParticles() {
+    for (var i = 0; i < particles.length; i++) {
+        var p = particles[i];
+        var a = Math.max(0, Math.min(1, p.life / p.maxLife));
+        ctx.globalAlpha = a;
+        ctx.fillStyle = p.color;
+        ctx.shadowBlur = 6;
+        ctx.shadowColor = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size * (0.4 + a * 0.6), 0, Math.PI * 2);
+        ctx.fill();
     }
-
-    /* ================= UI ================= */
-    function refreshStats() {
-        if (flying) {
-            statRangeEl.textContent  = posX.toFixed(2) + ' м';
-            statHeightEl.textContent = Math.max(0, posY).toFixed(2) + ' м';
-            statTimeEl.textContent   = t.toFixed(2) + ' с';
-            statRangeEl.classList.add('live');
-            statHeightEl.classList.add('live');
-            statTimeEl.classList.add('live');
-        } else {
-            const tr = trajectory();
-            statRangeEl.textContent  = tr.X.toFixed(2) + ' м';
-            statHeightEl.textContent = tr.Hm.toFixed(2) + ' м';
-            statTimeEl.textContent   = tr.T.toFixed(2) + ' с';
-            statRangeEl.classList.remove('live');
-            statHeightEl.classList.remove('live');
-            statTimeEl.classList.remove('live');
-        }
+    ctx.globalAlpha = 1;
+    ctx.shadowBlur = 0;
+}
+function spawnImpact(px, py) {
+    impact = { x: px, y: py, t: 0 };
+    flash = 1;
+    for (var i = 0; i < 50; i++) {
+        var ang = Math.random() * Math.PI * 2, spd = 80 + Math.random() * 260, life = 0.6 + Math.random() * 0.9;
+        particles.push({
+            x: px, y: py, vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd - 120, g: 450,
+            life: life, maxLife: life, size: 1.5 + Math.random() * 2.5,
+            color: Math.random() > 0.4 ? '#00f3ff' : '#ffaa00'
+        });
     }
+}
+function drawImpact() {
+    if (!impact) return;
+    var a = Math.max(0, 1 - impact.t / 1.8);
+    ctx.strokeStyle = 'rgba(0,243,255,' + (a * 0.7) + ')';
+    ctx.lineWidth = 2.5 * a + 0.5;
+    ctx.beginPath(); ctx.arc(impact.x, impact.y, impact.t * 180, 0, Math.PI * 2); ctx.stroke();
+    ctx.fillStyle = 'rgba(0,243,255,' + (a * 0.25) + ')';
+    ctx.beginPath(); ctx.arc(impact.x, impact.y, 25 * (1 + impact.t * 0.5), 0, Math.PI * 2); ctx.fill();
+}
 
-    function updateParams() {
-        angle   = parseFloat(angleSlider.value);
-        speed   = parseFloat(speedSlider.value);
-        gravity = parseFloat(gSlider.value);
+/* ===== 8. Физика ===== */
+var fireAngle = 45, fireSpeed = 50, fireGravity = 9.8, maxHeightReached = 0;
 
-        angleValEl.textContent = angle.toFixed(0) + '°';
-        speedValEl.textContent = speed.toFixed(0) + ' м/с';
-        gValEl.textContent     = gravity.toFixed(1) + ' м/с²';
+function updatePhysics(dt) {
+    if (!flying) return;
+    timeInFlight += dt;
+    var rad = fireAngle * Math.PI / 180;
+    var v0x = fireSpeed * Math.cos(rad), v0y = fireSpeed * Math.sin(rad);
+    posX = v0x * timeInFlight;
+    posY = v0y * timeInFlight - 0.5 * fireGravity * timeInFlight * timeInFlight;
+    if (posY > maxHeightReached) maxHeightReached = posY;
 
-        const tr = trajectory();
-        scale = computeScale(tr);
-
-        formulaXEl.textContent = 'x(t) = ' + tr.v0x.toFixed(1) + ' · t';
-        formulaYEl.textContent = 'y(t) = ' + tr.v0y.toFixed(1) + ' · t − ' +
-                                 (gravity / 2).toFixed(2) + ' · t²';
-
-        if (!flying) { t = 0; posX = 0; posY = 0; trail = []; }
-        refreshStats();
-    }
-
-    /* ================= Полёт ================= */
-    function launch() {
-        if (flying) return;
-        flying = true; t = 0; posX = 0; posY = 0;
-        trail = []; particles = []; flash = 0; impact = null;
-
-        const rad = angle * Math.PI / 180;
-        const mx = START_X + Math.cos(rad) * 50;
-        const my = groundY() - Math.sin(rad) * 50;
-        for (let i = 0; i < 18; i++) {
-            const a = -rad + (Math.random() - 0.5) * 1.0;
-            const sp = 80 + Math.random() * 220;
-            const life = 0.2 + Math.random() * 0.35;
-            particles.push({
-                x: mx, y: my, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp,
-                life: life, maxLife: life,
-                size: 1 + Math.random() * 2.5, color: '0,243,255'
-            });
-        }
-
-        fireBtn.textContent = 'В полёте…';
-        fireBtn.disabled = true;
-        refreshStats();
-    }
-
-    function explode() {
-        const px = START_X + posX * scale;
-        const py = groundY() - posY * scale;
-        impact = { x: px, y: py };
-        flash = 1;
-        for (let i = 0; i < 70; i++) {
-            const a  = Math.random() * Math.PI * 2;
-            const sp = 60 + Math.random() * 320;
-            const life = 0.35 + Math.random() * 0.9;
-            particles.push({
-                x: px, y: py,
-                vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 140,
-                life: life, maxLife: life,
-                size: 1 + Math.random() * 3,
-                color: Math.random() < 0.5 ? '0,243,255' : '255,170,0'
-            });
-        }
-    }
-
-    function land() {
-        posY = 0; flying = false; explode();
-        fireBtn.textContent = 'Запустить снаряд';
+    if (posY < 0 && timeInFlight > 0.02) {
+        var tLand = 2 * v0y / fireGravity;
+        timeInFlight = tLand; posX = v0x * tLand; posY = 0;
+        trail.push({ x: posX, y: posY });
+        spawnImpact(START_X + posX * scale, groundY());
+        flying = false;
         fireBtn.disabled = false;
-        refreshStats();
+        fireBtn.textContent = 'Запустить снаряд';
+        updateStats();
+        return;
     }
-
-    /* ================= Обновление ================= */
-    function update(dt) {
-        if (flying) {
-            t += dt;
-            const tr = trajectory();
-            posX = tr.v0x * t;
-            posY = tr.v0y * t - 0.5 * gravity * t * t;
-            trail.push({ x: posX, y: posY, life: 1 });
-            if (trail.length > 400) trail.shift();
-
-            if (t > 0.02 && posY <= 0) land();
-            else refreshStats();
-        }
-
-        for (let i = trail.length - 1; i >= 0; i--) {
-            trail[i].life -= dt * 0.35;
-            if (trail[i].life <= 0) trail.splice(i, 1);
-        }
-
-        for (let i = particles.length - 1; i >= 0; i--) {
-            const p = particles[i];
-            p.x += p.vx * dt;
-            p.y += p.vy * dt;
-            p.vy += 900 * dt;
-            p.vx *= 0.985;
-            p.vy *= 0.985;
-            p.life -= dt;
-            if (p.life <= 0) particles.splice(i, 1);
-        }
-
-        if (flash > 0) flash = Math.max(0, flash - dt * 2.5);
+    trail.push({ x: posX, y: posY });
+    if (trail.length > 5000) trail.shift();
+    if (Math.random() > 0.5) {
+        particles.push({
+            x: START_X + posX * scale, y: groundY() - posY * scale,
+            vx: (Math.random() - 0.5) * 20, vy: (Math.random() - 0.5) * 20, g: 0,
+            life: 0.4 + Math.random() * 0.3, maxLife: 0.7, size: 1 + Math.random() * 1.5, color: '#00f3ff'
+        });
     }
+    updateStats();
+}
 
-    /* ================= Рисование сцены ================= */
-    function roundRectPath(x, y, w, h, r) {
-        r = Math.min(r, w / 2, h / 2);
-        ctx.beginPath();
-        ctx.moveTo(x + r, y);
-        ctx.lineTo(x + w - r, y);
-        ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-        ctx.lineTo(x + w, y + h - r);
-        ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-        ctx.lineTo(x + r, y + h);
-        ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-        ctx.lineTo(x, y + r);
-        ctx.quadraticCurveTo(x, y, x + r, y);
-        ctx.closePath();
+/* ===== 9. Статистика и формулы ===== */
+function updateStats() {
+    statRangeEl.textContent = posX.toFixed(2) + ' м';
+    statHeightEl.textContent = (flying ? Math.max(0, posY) : maxHeightReached).toFixed(2) + ' м';
+    statTimeEl.textContent = timeInFlight.toFixed(2) + ' с';
+    liveTEl.textContent = timeInFlight.toFixed(2);
+    liveXEl.textContent = posX.toFixed(2);
+    liveYEl.textContent = Math.max(0, posY).toFixed(2);
+}
+function updatePreviewStats() {
+    if (flying) return;
+    var rad = angle * Math.PI / 180;
+    var v0x = speed * Math.cos(rad), v0y = speed * Math.sin(rad);
+    var tF = 2 * v0y / gravity;
+    statRangeEl.textContent = (v0x * tF).toFixed(2) + ' м';
+    statHeightEl.textContent = (v0y * v0y / (2 * gravity)).toFixed(2) + ' м';
+    statTimeEl.textContent = tF.toFixed(2) + ' с';
+    liveTEl.textContent = '0.00'; liveXEl.textContent = '0.00'; liveYEl.textContent = '0.00';
+}
+function updateFormula() {
+    var rad = angle * Math.PI / 180;
+    formulaXEl.textContent = 'x(t) = ' + (speed * Math.cos(rad)).toFixed(1) + ' · t';
+    formulaYEl.textContent = 'y(t) = ' + (speed * Math.sin(rad)).toFixed(1) + ' · t − ' + (gravity / 2).toFixed(2) + ' · t²';
+}
+
+/* ===== 10. Запуск ===== */
+function fire() {
+    if (flying) return;
+    posX = 0; posY = 0; timeInFlight = 0; maxHeightReached = 0;
+    trail = []; particles = []; impact = null; flash = 0;
+    fireAngle = angle; fireSpeed = speed; fireGravity = gravity;
+    scale = computeScale();
+    flying = true;
+    fireBtn.disabled = true;
+    fireBtn.textContent = 'Полёт...';
+    var gy = groundY();
+    for (var i = 0; i < 12; i++) {
+        particles.push({
+            x: START_X, y: gy, vx: (Math.random() - 0.5) * 120, vy: -Math.random() * 80, g: 300,
+            life: 0.4 + Math.random() * 0.3, maxLife: 0.7, size: 1 + Math.random() * 2, color: '#00f3ff'
+        });
     }
+}
 
-    function drawTrajectoryPreview() {
-        const tr = trajectory();
-        if (tr.T <= 0) return;
-        const gy = groundY();
-        const steps = 90;
+/* ===== 11. Главный цикл ===== */
+function frame(now) {
+    requestAnimationFrame(frame);
+    if (!lastFrameTime) lastFrameTime = now;
+    var dt = Math.min((now - lastFrameTime) / 1000, 0.05);
+    lastFrameTime = now;
 
-        ctx.beginPath();
-        for (let i = 0; i <= steps; i++) {
-            const tt = tr.T * i / steps;
-            const x = START_X + tr.v0x * tt * scale;
-            const y = gy - (tr.v0y * tt- 0.5 * gravity * tt * tt) * scale;
-            if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-        }
-        ctx.setLineDash([5, 8]);
-        ctx.lineWidth = 1.5;
-        ctx.strokeStyle = flying ? 'rgba(0,243,255,0.10)' : 'rgba(0,243,255,0.35)';
-        ctx.stroke();
-        ctx.setLineDash([]);
-    }
+    updatePhysics(dt);
+    updateParticles(dt);
+    if (impact) { impact.t += dt; if (impact.t > 1.8) impact = null; }
+    if (flash > 0) flash = Math.max(0, flash - dt * 2.5);
 
-    function drawGround() {
-        const gy = groundY();
-        const grad = ctx.createLinearGradient(0, gy, 0, gy + 70);
-        grad.addColorStop(0, 'rgba(0,243,255,0.12)');
-        grad.addColorStop(1, 'rgba(0,243,255,0)');
-        ctx.fillStyle = grad;
-        ctx.fillRect(0, gy, W, 70);
-
-        ctx.strokeStyle = '#1f293d';
-        ctx.lineWidth = 4;
-        ctx.beginPath();
-        ctx.moveTo(0, gy);
-        ctx.lineTo(W, gy);
-        ctx.stroke();
-
-        // светящаяся линия поверх тёмной полосы
-        ctx.strokeStyle = 'rgba(0,243,255,0.35)';
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(0, gy - 1);
-        ctx.lineTo(W, gy - 1);
-        ctx.stroke();
-    }
-
-    function drawCannon() {
-        const gy = groundY();
-        const rad = angle * Math.PI / 180;
-
-        ctx.fillStyle = '#0e1420';
-        ctx.strokeStyle = '#1f293d';
-        ctx.lineWidth = 2;
-        roundRectPath(START_X - 30, gy - 8, 60, 16, 6);
-        ctx.fill();
-        ctx.stroke();
-
-        ctx.save();
-        ctx.translate(START_X, gy);
-        ctx.rotate(-rad);
-
-        const bg = ctx.createLinearGradient(0, -9, 0, 9);
-        bg.addColorStop(0, '#33456a');
-        bg.addColorStop(0.5, '#182238');
-        bg.addColorStop(1, '#0b111c');
-        ctx.fillStyle = bg;
-        ctx.strokeStyle = '#2f4666';
-        ctx.lineWidth = 1.5;
-        roundRectPath(-6, -9, 56, 18, 4);
-        ctx.fill();
-        ctx.stroke();
-
-        ctx.fillStyle = '#00f3ff';
-        ctx.shadowColor = '#00f3ff';
-        ctx.shadowBlur = 12;
-        ctx.fillRect(44, -5, 6, 10);
-        ctx.restore();
-
-        ctx.beginPath();
-        ctx.arc(START_X, gy, 7, 0, Math.PI * 2);
-        ctx.fillStyle = '#0b111c';
-        ctx.fill();
-        ctx.strokeStyle = '#2f4666';
-        ctx.lineWidth = 2;
-        ctx.stroke();
-    }
-
-    function drawTrail() {
-        if (trail.length < 2) return;
-        const gy = groundY();
-        ctx.lineCap = 'round';
-        for (let i = 1; i < trail.length; i++) {
-            const a = trail[i - 1], b = trail[i];
-            const alpha = Math.max(0, b.life) * 0.75;
-            ctx.strokeStyle = 'rgba(0,243,255,' + alpha.toFixed(3) + ')';
-            ctx.lineWidth = 1.5 + alpha * 2.5;
-            ctx.beginPath();
-            ctx.moveTo(START_X + a.x * scale, gy - a.y * scale);
-            ctx.lineTo(START_X + b.x * scale, gy - b.y * scale);
-            ctx.stroke();
-        }
-        ctx.lineCap = 'butt';
-    }
-
-    function drawParticles() {
-        if (!particles.length && flash <= 0) return;
-        ctx.globalCompositeOperation = 'lighter';
-
-        for (const p of particles) {
-            const a = Math.max(0, p.life / p.maxLife);
-            ctx.fillStyle = 'rgba(' + p.color + ',' + (a * 0.9).toFixed(3) + ')';
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, p.size * (0.4 + a), 0, Math.PI * 2);
-            ctx.fill();
-        }
-
-        if (flash > 0 && impact) {
-            const r = (1 - flash) * 90 + 10;
-            ctx.strokeStyle = 'rgba(255,200,100,' + (flash * 0.8).toFixed(3) + ')';
-            ctx.lineWidth = 3 * flash + 1;
-            ctx.beginPath();
-            ctx.arc(impact.x, impact.y, r, 0, Math.PI * 2);
-            ctx.stroke();
-        }
-
-        ctx.globalCompositeOperation = 'source-over';
-    }
-
-    function drawProjectile() {
-        const px = START_X + posX * scale;
-        const py = groundY() - posY * scale;
-
-        ctx.save();
-        ctx.shadowColor = '#00f3ff';
-        ctx.shadowBlur = 18;
-        ctx.fillStyle = '#bffcff';
-        ctx.beginPath();
-        ctx.arc(px, py, 7, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-
-        ctx.fillStyle = '#ffffff';ctx.beginPath();
-        ctx.arc(px, py, 3, 0, Math.PI * 2);
-        ctx.fill();
-    }
-
-    function drawScaleBar() {
-        const gy = groundY();
-        let meters = 10, guard = 0;
-        while (meters * scale > 160 && guard++ < 60) meters /= 2;
-        while (meters * scale < 50  && guard++ < 120) meters *= 2;
-
-        const len = meters * scale;
-        const x1 = W - 40, x0 = x1 - len, y = gy + 46;
-        if (y > H - 12) return;
-
-        ctx.strokeStyle = 'rgba(126,139,155,0.7)';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(x0, y);     ctx.lineTo(x1, y);
-        ctx.moveTo(x0, y - 6); ctx.lineTo(x0, y + 6);
-        ctx.moveTo(x1, y - 6); ctx.lineTo(x1, y + 6);
-        ctx.stroke();
-
-        const label = (meters < 1 ? meters.toFixed(1) : meters.toFixed(0)) + ' м';
-        ctx.fillStyle = 'rgba(126,139,155,0.9)';
-        ctx.font = '12px monospace';
-        ctx.textAlign = 'center';
-        ctx.fillText(label, (x0 + x1) / 2, y - 10);
-        ctx.textAlign = 'left';
-    }
-
-    /* ================= Композиция кадра ================= */
-    function render(time) {
-        ctx.fillStyle = '#060810';
+    ctx.clearRect(0, 0, W, H);
+    if (bgCanvas) ctx.drawImage(bgCanvas, 0, 0, W, H);
+    drawGround();
+    drawDistanceMarkers();
+    drawTrajectoryPreview();
+    drawTrail();
+    drawCannon();
+    drawProjectile();
+    drawParticles();
+    drawImpact();
+    if (flash > 0) {
+        ctx.fillStyle = 'rgba(0,243,255,' + (flash * 0.12) + ')';
         ctx.fillRect(0, 0, W, H);
-
-        if (bgCanvas) ctx.drawImage(bgCanvas, 0, 0);
-
-        drawStars(time);
-        drawTrajectoryPreview();
-        drawGround();
-        drawHaze();
-        drawCannon();
-        drawTrail();
-        drawParticles();
-        drawProjectile();
-        drawScaleBar();
     }
+}
 
-    /* ================= Главный цикл ================= */
-    let last = 0;
-    function frame(now) {
-        if (!last) last = now;
-        let dt = (now - last) / 1000;
-        last = now;
-        if (dt > 0.05) dt = 0.05;
+/* ===== 12. Resize ===== */
+function resize() {
+    W = window.innerWidth;
+    H = window.innerHeight;
+    var dpr = window.devicePixelRatio || 1;
+    canvas.width = Math.floor(W * dpr);
+    canvas.height = Math.floor(H * dpr);
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    applyLayout();
+    buildBackground();
+    if (!flying) scale = computeScale();
+}
 
-        update(dt);
-        render(now);
-        requestAnimationFrame(frame);
+/* ===== 13. Инициализация (обработчики — первыми) ===== */
+function init() {
+    function onParam() {
+        updateFormula();
+        if (!flying) { trail = []; impact = null; scale = computeScale(); updatePreviewStats(); }
     }
+    angleSlider.addEventListener('input', function () {
+        angle = parseFloat(this.value); angleValEl.textContent = angle + '°'; onParam();
+    });
+    speedSlider.addEventListener('input', function () {
+        speed = parseFloat(this.value); speedValEl.textContent = speed + ' м/с'; onParam();
+    });
+    gSlider.addEventListener('input', function () {
+        gravity = parseFloat(this.value); gValEl.textContent = gravity.toFixed(1) + ' м/с²'; onParam();
+    });
+    fireBtn.addEventListener('click', fire);
 
-    /* ================= События ================= */
-    fireBtn.addEventListener('click', launch);
-    angleSlider.addEventListener('input', updateParams);
-    speedSlider.addEventListener('input', updateParams);
-    gSlider.addEventListener('input', updateParams);
+    for (var i = 0; i < layoutBtns.length; i++) {
+        (function (btn) {
+            btn.addEventListener('click', function () {
+                layoutSetting = btn.getAttribute('data-layout');
+                storeLayout(layoutSetting);
+                applyLayout();
+                if (!flying) { scale = computeScale(); }
+            });
+        })(layoutBtns[i]);
+    }
 
     window.addEventListener('resize', function () {
-        resize();
-        scale = computeScale(trajectory());
-        if (!flying) updateParams();
-        render(performance.now());
+        clearTimeout(resizeTimer); resizeTimer = setTimeout(resize, 100);
+    });
+    window.addEventListener('orientationchange', function () {
+        clearTimeout(resizeTimer); resizeTimer = setTimeout(resize, 150);
+    });
+    document.addEventListener('visibilitychange', function () {
+        if (document.hidden) lastFrameTime = 0;
     });
 
-    /* ================= Старт ================= */
+    layoutSetting = getStoredLayout();
     resize();
-    updateParams();
+    updateFormula();
+    updatePreviewStats();
     requestAnimationFrame(frame);
+}
+
+init();
 })();
 </script>
 </body>
